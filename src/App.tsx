@@ -1,25 +1,78 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
+
+import styled from "styled-components";
+import { toDoState } from "./atoms";
+import DraggableCard from "./Components/DraggableCard";
+
+const Wrapper = styled.div`
+  display: flex;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
+
+const Boards = styled.div`
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(1, 1fr);
+`;
+
+const Board = styled.div`
+  padding: 20px 10px;
+  padding-top: 30px;
+  background-color: white;
+  border-radius: 5px;
+  min-height: 200px;
+`;
+
+const Card = styled.div`
+  border-radius: 5px;
+  margin-bottom: 5px;
+  padding: 10px 10px;
+  background-color: beige;
+`;
+
+const toDos = ["a", "b", "c", "d", "e", "f"];
 
 function App() {
+  const [toDos, setToDos] = useRecoilState(toDoState);
+  const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
+    if (!destination) return; // drop same place
+
+    setToDos((oldToDos) => {
+      const copyToDos = [...oldToDos];
+      copyToDos.splice(source.index, 1);
+      copyToDos.splice(destination?.index, 0, draggableId);
+      return copyToDos;
+    });
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Wrapper>
+        <Boards>
+          <Droppable droppableId="one">
+            {(magic) => (
+              <Board ref={magic.innerRef} {...magic.droppableProps}>
+                {toDos.map((toDo, index) => (
+                  <DraggableCard key={toDo} toDo={toDo} index={index} />
+                  // beautiful dnd 사용 시 key와 draggableId는 동일해야 함
+                ))}
+                {magic.placeholder}
+              </Board>
+            )}
+          </Droppable>
+        </Boards>
+      </Wrapper>
+    </DragDropContext>
   );
 }
 
