@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { RecoilRoot } from "recoil";
 import App from "./App";
@@ -59,7 +58,7 @@ table {
 body {
   font-weight: 300;
   font-family: 'Source Sans Pro', sans-serif;
-  background-color:tomato;
+  background-color:aliceblue;
   color:black;
   line-height: 1.2;
 }
